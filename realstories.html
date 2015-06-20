@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html lang ="en">
+<head>
+	<meta charset="utf-8" />
+  <meta http-equiv=”content-type” content=”text/html″;>
+
+	<title>ReachOutApp</title>
+
+	<link rel="stylesheet" href="themes/ROut.min.css" />
+	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+
+
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+  <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+ <script type="text/javascript">
+
+$.ajax({
+    type: "GET",
+    url: "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D'http%3A%2F%2Fie.reachout.com%2Fblog%2Ffeed%2F'&format=json&diagnostics=true&callback=",
+    dataType: "json",
+    success: function(json) {
+      var contain = $("#blogFeed");
+      var limit = 10;
+      var items = json.query.results.item;
+
+      items.forEach(function (item, index) {
+        if( index < limit ){
+          var pageId = newPage(item, index);
+
+          var title = $('<h3 />').html(item.title);
+          var url = item.link;
+          var desc = $('<p />').html(item.description);
+          var encoded = $(item.encoded);
+          var img = encoded.find('img');
+
+          var listItem = $('<li />').appendTo(contain);
+
+          $('<a />').attr('href', '#' + pageId)
+          .append(img)
+          .append(title)
+          .append(desc)
+          .appendTo(listItem);
+
+        }
+      });
+      contain.listview('refresh');
+    }
+  });
+function newPage(item, index){
+  var pageId = 'blogpost-' + index;
+  var page = $('<div />').attr({
+      'data-role': 'page',
+      'data-transition':'slide',
+      'id': pageId
+  });
+  // Header
+  $('<div />').attr('data-role', 'header')
+    .append(
+        $('<a />').attr('data-rel', 'back').html('Back'),
+        $('<h1 />').html(item.title)
+    ).appendTo(page);
+
+  // Content
+  $('<div />').attr('data-role', 'main').addClass('ui-content').html(item.encoded).appendTo(page);
+
+  // Navbar
+  var navbar = '<nav data-role="navbar"><ul><li><a href="#" data-icon="home">Latest</a></li><li><a href="#" data-icon="star">Featured</a></li><li><a href="#" data-icon="plus">Real Stories</a></li><li><a href="#" data-icon="info">More</a></li> </ul></nav>';
+
+  // Footer
+  $('<div />').attr({
+      'data-role': 'footer',
+      'data-position': 'fixed'
+  }).append(navbar).appendTo(page);
+
+  page.appendTo($.mobile.pageContainer);
+  return pageId;
+}
+
+ </script>
+
+
+
+</head>
+
+<body>
+
+	<div data-role="page" id="page1">
+
+	<div data-role="header" class="blogTitle">
+
+		<h1>ReachOut App</h1>
+
+	</div>
+
+	<div data-role="main" class="ui-content">
+    <ul data-role="listview" id="blogFeed"></ul>
+
+	</div>
+
+	<div data-role="footer" data-position="fixed">
+
+		<nav data-role="navbar">
+			<ul>
+				<li><a href="#" data-icon="home">Latest</a></li>
+				<li><a href="#" data-icon="star">Featured</a></li>
+				<li><a href="#" data-icon="plus">Real Stories</a></li>
+				<li><a href="#" data-icon="info">More</a></li>
+			</ul>
+		</nav>
+
+	</div>
+
+	</div>
+
+
+</body>
+
+</html>
